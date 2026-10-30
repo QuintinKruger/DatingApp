@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <!-- ensure compiler knows if something is null or note to warn us in our cod, this adds squiggles under null values
+    to rid them we need to make them optional to tell tehe compiler - hey we are fine with the value possibly being null -->
+    <Nullable>enable</Nullable>
+    <!-- to reduce boiler plate 'using' statements - like those from System - this is why using System; is greyed out in classes -->
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseAppHost>false</UseAppHost>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CloudinaryDotNet" Version="1.29.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.13" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.13" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.13" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.23.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.23.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DTOs\" />
+    <Folder Include="Entities\" />
+    <Folder Include="Errors\" />
+    <Folder Include="Interfaces\" />
+    <Folder Include="Middleware\" />
+    <Folder Include="Services\" />
+  </ItemGroup>
+
+</Project>

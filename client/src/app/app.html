@@ -1,0 +1,18 @@
+<app-nav />
+
+<!-- for input properties we spcify the property using [] -->
+<!-- <app-home [membersFromApp]="members()"/> -->
+
+<!-- Rather than hard coding a component, we add the router outlet -->
+<!-- <app-home/> -->
+<!-- Conditional styling can be applied to only specific components -->
+<!-- <div [ngClass]="{'mt-24 container mx-auto' : !(router.url === '/')}"> -->
+<!-- latest style guide from angular https://angular.dev/overview suggests the above is old and the new way to do it is done below -->
+<div 
+    [class.mt-24]="router.url !== '/'"
+    [class.container]="router.url !== '/'"
+    [class.mx-auto]="router.url !== '/'">
+
+    <!-- component at specific route path will be loaded here -->
+    <router-outlet />
+</div>

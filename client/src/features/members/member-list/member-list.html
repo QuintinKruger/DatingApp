@@ -1,0 +1,6 @@
+<div class="grid grid-cols-5 gap-6">
+    <!-- async pipe will allow us to subscribe and unsubscribe from an obseravable - this requires the AsyncPipe import -->
+    @for (member of members$ | async ; track member.id) {
+        <app-member-card [member]="member"/>
+    }
+</div>

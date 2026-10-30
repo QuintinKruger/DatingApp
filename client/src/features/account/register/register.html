@@ -1,0 +1,87 @@
+<div class="card bg-base-100 w-1/2 mx-auto flex flex-col p-6 rounded-lg shadow-lg">
+    <div class="card-title justify-center text-3xl text-primary">Sign up</div>
+    <div class="card-body width-full">
+        <!-- templte driven form -->
+        <!-- <form #registerForm="ngForm" class="flex flex-col gap-4 w-full" (ngSubmit)="register()">
+            <input class="input w-full" name="email" [(ngModel)]="creds.email" placeholder="Email" />
+            <input class="input w-full" name="displayName" [(ngModel)]="creds.displayName" placeholder="Display name" />
+            <input type="password" class="input w-full" name="password" [(ngModel)]="creds.password" placeholder="Password" />
+        
+            <div class="flex items-center justify-end gap-3">
+                <button (click)="cancel()" class="btn" type="button">Cancel</button>
+                <button class="btn btn-primary" type="submit">Register</button>
+            </div>
+        </form> -->
+        <ul class="steps">
+            <li class="step step-primary">
+                Crendetials
+            </li>
+            <li class="step" [class.step-primary]="currentStep() === 2">
+                Profile
+            </li>
+        </ul>
+        @if (currentStep() === 1) {
+        <!-- formGroup must match name of variable given to reactive form in register.ts -->
+        <form [formGroup]="credentialsForm" class="flex flex-col gap-4 w-full steps">
+            <app-text-input formControlName="email" label="Email" class="mt-2"/>
+            <!-- <label class="floating-label text-left flex flex-col gap-1">
+                <span>Display name</span>
+                <input class="input w-full" formControlName="displayName" placeholder="Display name" 
+                    [class.input-error]="registerForm.controls['displayName'].invalid && registerForm.controls['displayName'].touched"/>
+                @if(registerForm.controls['displayName'].invalid && 
+                    registerForm.controls['displayName'].touched) {
+                        <div class="text-error text-xs">
+                            Display name is required
+                        </div>
+
+                }   
+            </label> -->
+            <!-- above replaced by reusable component below -->
+            <app-text-input label="Display name" formControlName="displayName"/>
+            <app-text-input formControlName="password" label="Password" type="password" />
+            <app-text-input formControlName="confirmPassword" label="Confirm password" type="password" />
+            <div class="flex items-center justify-end gap-3">
+                <button (click)="cancel()" class="btn" type="button">Cancel</button>
+                <button class="btn btn-primary" (click)="nextStep()" type="button"
+                    [disabled]="!credentialsForm.valid">Next</button>
+            </div>
+        </form>
+        }
+
+        @if (currentStep() === 2) {
+        <form [formGroup]="profileForm" class="flex flex-col w-full gap-4 steps">
+            <div class="flex items-center gap-4">
+                <div class="font-semibold">Gender: </div>
+                <label class="flex gap-3 items-center">
+                    <span>Male</span>
+                    <input type="radio" formControlName="gender" value="male" class="radio radio-primary">
+                </label>
+                <label class="flex gap-3 items-center">
+                    <span>Female</span>
+                    <input type="radio" formControlName="gender" value="female" class="radio radio-primary">
+                </label>
+            </div>
+            <app-text-input formControlName="dateOfBirth" label="Date of Birth" type="date" [maxDate]="getMaxDate()"/>
+            <app-text-input formControlName="city" label="City"/>
+            <app-text-input formControlName="country" label="Country"/>
+            
+            <div class="flex items-center justify-end gap-3">
+                <button (click)="prevStep()" class="btn" type="button">Back</button>
+                <button class="btn btn-primary" (click)="register()" type="button"
+                    [disabled]="!profileForm.valid">Register</button>
+            </div>
+        </form>
+        }
+
+    </div>
+    @if(validationErrors().length > 0) {
+        <div class="mt-5 flex bg-gray-200 rounded-2xl w-1/2 p-3 mx-auto">
+            <ul class="flex flex-col text-error space-y-1">
+                @for (error of validationErrors(); track $index) {
+                    <li>{{error}}</li>
+                }
+            </ul>
+
+        </div>
+    }
+</div>
