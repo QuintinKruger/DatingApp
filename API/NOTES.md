@@ -33,6 +33,8 @@ With the migration created we can apply them to the database using the command
 dotnet ef database update
 ```
 
+Alternatively, simly starting the application will also perform the migration
+
 To check whether there are migrations needed we can run the following 
 ``` bash
 dotnet ef migrations has-pending-model-changes

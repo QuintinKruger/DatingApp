@@ -13,6 +13,9 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
     public DbSet<AppUser> Users {get; set;} // represents Users table in DB
     public DbSet<Member> Members { get; set; }
     public DbSet<Photo> Photos { get; set; }
+    public DbSet<MemberLike> Likes { get; set; }
+
+    public DbSet<Message> Messages { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -20,6 +23,34 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
         // model builder can be used to override entity framework functionality 
         // here we are overriding the inability for sql-lite to store times as UTC format (dates with a Z suffix)
         base.OnModelCreating(modelBuilder); 
+
+
+        // no conventiion for many-to-many relationship on a self referenced 
+        // table, thus resort to configuration ourselves. We are creating a join table
+        // recall this means defining a 2 many-to-one relationships with a join table
+        // Member }-| MemberLike (join table) |-{ Member 
+        modelBuilder.Entity<MemberLike>()
+            .HasKey(x => new {x.SourceMemberId, x.TargetMemberId}); // composite primary key for MemberLike table
+        modelBuilder.Entity<MemberLike>()
+            .HasOne(s => s.SourceMember)
+            .WithMany(t => t.LikedMembers)
+            .HasForeignKey(s => s.SourceMemberId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<MemberLike>()
+            .HasOne(s => s.TargetMember)
+            .WithMany(t => t.LikedByMembers)
+            .HasForeignKey(s => s.TargetMemberId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<Message>()
+            .HasOne(x => x.Recipient)
+            .WithMany(m => m.MessagesReceived)
+            .OnDelete(DeleteBehavior.Restrict); // dont delete messages received when message deleted
+        modelBuilder.Entity<Message>()
+            .HasOne(x => x.Sender)
+            .WithMany(m => m.MessagesSent)
+            .OnDelete(DeleteBehavior.Restrict); // dont delete messages received when message deleted
+
 
         var dateTimeConverter = new ValueConverter<DateTime, DateTime>(
             v => v.ToUniversalTime(),
