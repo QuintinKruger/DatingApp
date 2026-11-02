@@ -1,21 +1,86 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { MemberService } from '../../../core/member-service';
-import { Observable } from 'rxjs';
-import { Member } from '../../../types/member';
+import { filter, Observable } from 'rxjs';
+import { Member, MemberParams } from '../../../types/member';
 import { AsyncPipe } from '@angular/common';
 import { MemberCard } from '../member-card/member-card';
+import { PaginatedResult } from '../../../types/pagination';
+import { Paginator } from '../../../shared/paginator/paginator';
+import { FilterModal } from '../filter-modal/filter-modal';
 
 @Component({
   selector: 'app-member-list',
-  imports: [AsyncPipe, MemberCard],
+  imports: [MemberCard, Paginator, FilterModal],
   templateUrl: './member-list.html',
   styleUrl: './member-list.css',
 })
-export class MemberList {
+export class MemberList implements OnInit{
+  @ViewChild('filterModal') modal!: FilterModal // override TS warning with !
   private memberService = inject(MemberService);
-  protected members$:  Observable<Member[]>;// defining an observable has the naming convention of suffixing with $
+  protected paginatedMembers = signal<PaginatedResult<Member> | null>(null);// defining an observable has the naming convention of suffixing with $
+  protected memberParams = new MemberParams() // create new instance with default field values defined
+  private updatedParams = new MemberParams(); // will not be part of 2 way binding to prevent displayMessage from displaying incorrect filter data which was not submitted
 
-  constructor () {
-    this.members$ = this.memberService.getMembers();
+  constructor() {
+    const filters = localStorage.getItem("filters")
+    if (filters) {
+      this.memberParams = JSON.parse(filters);
+      this.updatedParams =  JSON.parse(filters);
+    }
+  }
+  ngOnInit(): void {
+    this.loadMembers();
+  }
+
+  loadMembers() {
+     this.memberService.getMembers(this.memberParams).subscribe({
+      next: result => this.paginatedMembers.set(result)
+     })
+  }
+
+  onPageChange($event: { pageNumber: number; pageSize: number; }) {
+    this.memberParams.pageNumber = $event.pageNumber;
+    this.memberParams.pageSize = $event.pageSize;
+    this.loadMembers();
+  }
+
+  openModal() {
+    this.modal.open(); // this calls the FilterModal component's open method
+  }
+
+  onClose() {
+    console.log("Modal close") 
+  }
+
+  onFilterChange(data: MemberParams) {
+    this.memberParams = {...data}
+    this.updatedParams = {...data} // copy of data rather than reference same object
+    this.loadMembers();
+  }
+
+  resetFilters() {
+    this.memberParams = new MemberParams()
+    this.updatedParams = new MemberParams();
+    this.loadMembers()
+  }
+
+  get displayMessage() : string {
+    const defaultParams = new MemberParams();
+    const filters: string[] = [];
+
+    if (this.updatedParams.gender) {
+      filters.push(this.updatedParams.gender + "s")
+    } else {
+      filters.push("Males. Females")
+    }
+
+    if (this.updatedParams.minAge !== defaultParams.minAge || this.updatedParams.maxAge !== defaultParams.maxAge)
+    {
+      filters.push(` ages ${this.updatedParams.minAge}-${this.updatedParams.maxAge}`)
+    }
+
+    filters.push(this.updatedParams.orderBy === 'lastActive' ? 'Recently active' : 'Newest members')
+
+    return filters.length > 0 ? `Selected: ${filters.join("  | ")}` : "All members"
   }
 }

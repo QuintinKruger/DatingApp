@@ -25,3 +25,12 @@ export type EditableMember = {
   country:string
 }
 
+export class MemberParams { // class because it allows us to initialize values
+  gender?: string;
+  minAge = 18;
+  maxAge = 100;
+  pageNumber = 1;
+  pageSize = 10;
+  orderBy = "lastActive"
+}
+

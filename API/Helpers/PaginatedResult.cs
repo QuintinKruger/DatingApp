@@ -5,7 +5,7 @@ namespace API.Helpers;
 
 public class PaginatedResult<T>
 {
-    public PaginationMetaData MetaData { get; set; } = default!; // use default for the type, in this case a class type which is null, add the '!' to ignore the null warning
+    public PaginationMetaData Metadata { get; set; } = default!; // use default for the type, in this case a class type which is null, add the '!' to ignore the null warning
     public List<T> Items { get; set; } = [];
 
 };
@@ -27,7 +27,7 @@ public class PaginationHelper
                 .ToListAsync(); // query is made to the database 
         return new PaginatedResult<T>
         {
-            MetaData = new PaginationMetaData
+            Metadata = new PaginationMetaData
             {
                 CurrentPage = pageNumber,
                 TotalPages = (int)Math.Ceiling(count / (double)pageSize),

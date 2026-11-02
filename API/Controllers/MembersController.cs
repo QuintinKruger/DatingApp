@@ -22,12 +22,15 @@ public class MembersController(
     [HttpGet]
     // best practice to handle requests asynchronously to allow other requests to still be processed 
     // while the current request is waiting for response from DB or similar async-able invocation 
-    public async Task<ActionResult<IReadOnlyList<Member>>> GetMembers([FromQuery]PagingParams pagingParams)
+    public async Task<ActionResult<IReadOnlyList<Member>>> GetMembers([FromQuery]MemberParams memberParams)
     {
         // await the async call means to make the call and hand it to a thread to handle the response once 
         // it comes back. This unblocks the current thread servicing the request received to receive other requests
         // while this call is still being made
-        var members = await memberRepository.GetMembersAsync(pagingParams);
+
+        memberParams.CurrentMemberId = User.GetMemberId();
+        
+        var members = await memberRepository.GetMembersAsync(memberParams);
         return Ok(members);
     }
 

@@ -1,6 +1,7 @@
 using System.Text;
 using API.Data;
 using API.Extensions;
+using API.Helpers;
 using API.Interfaces;
 using API.Middleware;
 using API.Services;
@@ -23,6 +24,7 @@ builder.Services.AddCors(); // to add CORS header to responses for clients to ac
 // builder.Services.AddTransient() // new instance of service everytime its queried from service container
 builder.Services.AddScoped<ITokenService, TokenService>(); // lives for the duration of an HTTP request 
 builder.Services.AddScoped<IPhotoService, PhotoService>();
+builder.Services.AddScoped<LogUserActivity>(); 
 // see https://learn.microsoft.com/en-us/dotnet/core/extensions/dependency-injection/service-lifetimes fore more`
 
 // add repository to be used in app
