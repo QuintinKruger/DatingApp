@@ -1,11 +1,13 @@
 using System.Text;
 using API.Data;
+using API.Entities;
 using API.Extensions;
 using API.Helpers;
 using API.Interfaces;
 using API.Middleware;
 using API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -35,6 +37,17 @@ builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 // 'bind' configuration defined in appsettings.json, section CloudinarySettings to the CloudinarySettings class
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 
+
+// configure identity for our application
+builder.Services.AddIdentityCore<AppUser>(opt =>
+{
+   opt.Password.RequireNonAlphanumeric = false; // define password complexity, by default they are very stringent, here we are making it less so
+   opt.User.RequireUniqueEmail = true; // because we are using email as username too
+})
+.AddRoles<IdentityRole>()
+.AddEntityFrameworkStores<AppDbContext>();
+
+
 // define middleware for authenticating using JWT providing decryption strategy using symetric key 
 // (similar to how we setup encryption in TokenService)
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -50,17 +63,24 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"))   
+    .AddPolicy("ModeratePhotoRole", policy => policy.RequireRole("Admin", "Moderator"));    
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline. 
 // for middleware, does something on request coming in before sending it through our app or before sending it out from our app
 // ordering is NB!
 app.UseMiddleware<ExceptionMiddleware>();
-app.UseCors( x => x.AllowAnyHeader().AllowAnyMethod()
+app.UseCors( x => x
+    .AllowCredentials() // allows to send cookies
+    .AllowAnyHeader()
+    .AllowAnyMethod()
     .WithOrigins("http://localhost:4200", "https://localhost:4200"));
 
 app.UseAuthentication(); 
-app.UseAuthorization();
+app.UseAuthorization(); // role based and policy based authorization works because of this added to middleware
 
 app.MapControllers();
 
@@ -71,8 +91,9 @@ var services = scope.ServiceProvider;
 try
 {
     var context = services.GetRequiredService<AppDbContext>();
+    var userManager = services.GetRequiredService<UserManager<AppUser>>();
     await context.Database.MigrateAsync(); // create database using migrations if not already exists
-    await Seed.SeedUsers(context);
+    await Seed.SeedUsers(userManager);
 
 } catch (Exception ex)
 {

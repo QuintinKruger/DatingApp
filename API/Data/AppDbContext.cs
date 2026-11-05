@@ -1,16 +1,19 @@
 using System;
 using API.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace API.Data;
 
 // abstraction of the DB
-public class AppDbContext(DbContextOptions options) : DbContext(options)
+public class AppDbContext(DbContextOptions options) : IdentityDbContext<AppUser>(options)
 {
     
     // tell DbContext about of entities 
-    public DbSet<AppUser> Users {get; set;} // represents Users table in DB
+    // public DbSet<AppUser> Users {get; set;} // represents Users table in DB
+    // above already provided by IdentityDbContext
     public DbSet<Member> Members { get; set; }
     public DbSet<Photo> Photos { get; set; }
     public DbSet<MemberLike> Likes { get; set; }
@@ -23,6 +26,14 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
         // model builder can be used to override entity framework functionality 
         // here we are overriding the inability for sql-lite to store times as UTC format (dates with a Z suffix)
         base.OnModelCreating(modelBuilder); 
+
+        // different way of seeding data into our DB
+        modelBuilder.Entity<IdentityRole>()
+            .HasData(
+                new IdentityRole{Id = "member-id", ConcurrencyStamp="a", Name="Member", NormalizedName="MEMBER"},
+                new IdentityRole{Id = "moderator-id", ConcurrencyStamp="b", Name="Moderator", NormalizedName="MODERATOR"},
+                new IdentityRole{Id = "admin-id", ConcurrencyStamp="c", Name="Admin", NormalizedName="ADMIN"}
+            );
 
 
         // no conventiion for many-to-many relationship on a self referenced 

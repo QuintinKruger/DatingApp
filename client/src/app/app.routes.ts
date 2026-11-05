@@ -13,6 +13,8 @@ import { MemberPhotos } from '../features/members/member-photos/member-photos';
 import { MemberMessages } from '../features/members/member-messages/member-messages';
 import { memberResolver } from '../features/members/member-resolver';
 import { preventUnsaveChangesGuard } from '../core/guards/prevent-unsave-changes-guard';
+import { Admin } from '../features/admin/admin';
+import { adminGuard } from '../core/guards/admin-guard';
 
 // Angular's router checks routes in array order and uses the first one that matches. It doesn't look for the best match.
 // thus anything below { path: '**', component: Home } will not be routed to as the wild card wins out always 
@@ -38,6 +40,7 @@ export const routes: Routes = [
             }, // :id is a dynamic route parameter 
             { path: 'lists', component: Lists },
             { path: 'messages', component: Messages },
+            { path: 'admin', component: Admin, canActivate: [adminGuard] },
         ]
     },
     // { path: 'members', component: MemberList, canActivate: [authGuard] }, // defining a guard for a single route            

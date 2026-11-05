@@ -23,7 +23,7 @@ export const appConfig: ApplicationConfig = {
       return new Promise<void>((resolve) => {
         setTimeout(async () => {
           try {
-            return lastValueFrom(initService.init())
+            await lastValueFrom(initService.init())
           } finally { // when app has been initialized 
             const splash = document.getElementById('initial-splash')
             if (splash) {

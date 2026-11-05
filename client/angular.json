@@ -33,6 +33,12 @@
         "@schematics/angular:pipe": {
           "skipTests": true,
           "path": "src/core/pipes"
+        },
+        // directives are used much any more included here for course anyway to know 
+        // what they are
+        "@schematics/angular:directive": { 
+          "skipTests": true,
+          "path": "src/shared/directives"
         }
       },
       "root": "",

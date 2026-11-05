@@ -19,7 +19,7 @@ export class ToastService {
     if (!document.getElementById('toast-container')) {
       const container = document.createElement('div')
       container.id = 'toast-container'
-      container.className = 'toast toast-bottom toast-end' // tailwind / daisy UI classes 
+      container.className = 'toast toast-bottom toast-end z-50' // tailwind / daisy UI classes 
       document.body.appendChild(container);
     }
   }

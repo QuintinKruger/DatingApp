@@ -5,10 +5,11 @@ import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { ToastService } from '../../core/services/toast-service';
 import { themes } from '../theme';
 import { BusyService } from '../../core/busy-service';
+import { HasRole } from '../../shared/directives/has-role';
 
 @Component({
   selector: 'app-nav',
-  imports: [FormsModule, RouterLink, RouterLinkActive], // to use templated angular forms in html 
+  imports: [FormsModule, RouterLink, RouterLinkActive, HasRole], // to use templated angular forms in html 
   templateUrl: './nav.html',
   styleUrl: './nav.css',
 })
