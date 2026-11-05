@@ -30,6 +30,7 @@ builder.Services.AddScoped<LogUserActivity>();
 // add repository to be used in app
 builder.Services.AddScoped<IMemberRepository, MemberRepository>(); 
 builder.Services.AddScoped<ILikesRepository, LikesRespository>();
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 
 // 'bind' configuration defined in appsettings.json, section CloudinarySettings to the CloudinarySettings class
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
