@@ -6,6 +6,7 @@ import { filter, Observable } from 'rxjs';
 import { Member } from '../../../types/member';
 import { AgePipe } from '../../../core/pipes/age-pipe';
 import { AccountService } from '../../../core/services/account-service';
+import { PrecenseService } from '../../../core/precense-service';
 
 @Component({
   selector: 'app-member-detailed',
@@ -25,6 +26,7 @@ export class MemberDetailed implements OnInit {
   protected isCurrentUser = computed(() =>
     this.accountService.currentUser()?.id === this.route.snapshot.paramMap.get("id")
   )
+  protected presenceService = inject(PrecenseService)
 
   ngOnInit(): void {
     // this.member$ = this.loadMember();

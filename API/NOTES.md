@@ -75,6 +75,19 @@ We can provide middleware through which requests will pass before our app servic
 
 We can define our own middleware as has been in [ExceptionMiddleware.cs](./Middleware/ExceptionMiddleware.cs) and we can hook it up to our ASP.NET application in [Program.cs](./Program.cs#46) - in this case, provided as the first middleware component as we want it to apply to everything in our code base. 
 
+# SignalR
+Allows for 2 way communication over WebSockets but also provides a stream of data from server to client using Server Side Events. There is also support for long polling by SignalR 
+
+SignalR takes care of what it employs to allow for a stream of data to and or from client based on what the client supports - typically this is whebsockets. The order of technology selected:
+1. WebSockets
+2. Server Side Events
+3. Long Polling 
+
+SignalR also provides a client side npm package - nice !
+
+SingalR also handles connections and reconnections with clients and is able to automatically notify connections of other connections that have joined the network - ideal for chat functionality !
+
+
 # Extensions 
 
 

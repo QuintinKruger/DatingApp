@@ -6,6 +6,7 @@ using API.Helpers;
 using API.Interfaces;
 using API.Middleware;
 using API.Services;
+using API.SignalR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -36,6 +37,8 @@ builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 
 // 'bind' configuration defined in appsettings.json, section CloudinarySettings to the CloudinarySettings class
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+builder.Services.AddSignalR();
+builder.Services.AddSingleton<PresenceTracker>();
 
 
 // configure identity for our application
@@ -53,6 +56,7 @@ builder.Services.AddIdentityCore<AppUser>(opt =>
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
+        // for http
         var tokenKey = builder.Configuration["TokenKey"] ?? throw new Exception("Token key not found");
         options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -61,6 +65,29 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuer = false,
             ValidateAudience = false
         };
+
+        // for signalR - its websocket based thus the above does not apply to it
+        // SignalR will establish a connection over http first thus we have access
+        // to http context data when connection first starts 
+        // we pull data from this connection to setup security for websocket connection establsihed (assuming this is the 
+        // protocol selected by SignalR - recall the fallback is SSR and fallback for that is HTTP long polling)
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"]; // spelling expected like this as this is how signalR npm package passes it up to server
+
+                var path = context.HttpContext.Request.Path;
+
+                if (!string.IsNullOrEmpty(path) && path.StartsWithSegments("/hubs")) // matches path of middleware we provided below for signalR
+                {
+                    context.Token = accessToken;
+                }
+
+                return Task.CompletedTask;
+            }
+        };
+
     });
 
 builder.Services.AddAuthorizationBuilder()
@@ -83,6 +110,8 @@ app.UseAuthentication();
 app.UseAuthorization(); // role based and policy based authorization works because of this added to middleware
 
 app.MapControllers();
+app.MapHub<PresenceHub>("hubs/presence");
+app.MapHub<MessageHub>("hubs/messages");
 
 // add seed data to our DB
 // service locator pattern used below - this is because we do not have access to our dependencies here
@@ -93,6 +122,7 @@ try
     var context = services.GetRequiredService<AppDbContext>();
     var userManager = services.GetRequiredService<UserManager<AppUser>>();
     await context.Database.MigrateAsync(); // create database using migrations if not already exists
+    await context.Connections.ExecuteDeleteAsync(); // clear everything in connections to make sure no connections remain after restart of server
     await Seed.SeedUsers(userManager);
 
 } catch (Exception ex)
