@@ -7,7 +7,6 @@ namespace API.Middleware;
 public interface IMemberRepository
 {
     void Update(Member member);
-    Task<bool> SaveAllAsync();
     Task<PaginatedResult<Member>> GetMembersAsync(MemberParams memberParams); // convention to suffix methods that return task with Async
     Task<Member?> GetMemberByIdAsync(string id);
     Task<IReadOnlyList<Photo>> GetPhotosForMemberAsync(string memberId);

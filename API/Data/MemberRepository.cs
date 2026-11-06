@@ -56,11 +56,6 @@ public class MemberRepository(AppDbContext context) : IMemberRepository
             .SelectMany(x => x.Photos).ToListAsync();
     }
 
-    public async Task<bool> SaveAllAsync()
-    {
-        return await context.SaveChangesAsync() > 0;
-    }
-
     // not strictly needed - change tracking is already setup for us 
     // for the Member entity by EF. 
     public void Update(Member member)

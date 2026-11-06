@@ -4,10 +4,11 @@ import { firstValueFrom } from 'rxjs';
 import { Nav } from '../layout/nav/nav';
 import { User } from '../types/user';
 import { Router, RouterOutlet } from '@angular/router';
+import { ConfirmDialog } from '../shared/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'app-root',
-  imports: [Nav, RouterOutlet], // any component used in app.html is added here
+  imports: [Nav, RouterOutlet, ConfirmDialog], // any component used in app.html is added here
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

@@ -7,6 +7,7 @@ import { Member } from '../../../types/member';
 import { AgePipe } from '../../../core/pipes/age-pipe';
 import { AccountService } from '../../../core/services/account-service';
 import { PrecenseService } from '../../../core/precense-service';
+import { LikesService } from '../../../core/likes-service';
 
 @Component({
   selector: 'app-member-detailed',
@@ -19,14 +20,23 @@ export class MemberDetailed implements OnInit {
   protected memberService = inject(MemberService)
   private route = inject(ActivatedRoute) // gives us access to route parameters 
   private router = inject(Router)
+  private routeId = signal<string|null>(null)
   protected title = signal<string | undefined>('Profile')
+  protected likesService = inject(LikesService)
   // protected member$?: Observable<Member>; now becomes the below seeing as we are not using loadMember anymore
   // protected member = signal<Member | undefined>(undefined);
   // derived signal 
   protected isCurrentUser = computed(() =>
-    this.accountService.currentUser()?.id === this.route.snapshot.paramMap.get("id")
+    this.accountService.currentUser()?.id === this.routeId()
   )
   protected presenceService = inject(PrecenseService)
+  protected hasLiked = computed(() => this.likesService.likeIds().includes(this.routeId()!));
+
+  constructor() {
+    this.route.paramMap.subscribe(params => {
+      this.routeId.set(params.get("id"))
+    })
+  }
 
   ngOnInit(): void {
     // this.member$ = this.loadMember();

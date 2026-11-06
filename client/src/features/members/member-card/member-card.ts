@@ -20,14 +20,6 @@ export class MemberCard {
 
   toggleLike(event: Event) {
     event.stopPropagation() // prevent click event from propogating to element that will navigate user to the profile of member (<div routerLink="/members/{{member.id}}".... in template)
-    this.likesService.toggleLike(this.member().id).subscribe({
-      next: () => {
-        if (this.hasLiked()) {
-          this.likesService.likeIds.update(ids => ids.filter(x => x !== this.member().id))
-        } else {
-          this.likesService.likeIds.update(ids => [...ids, this.member().id])
-        }
-      }
-    })
+    this.likesService.toggleLike(this.member().id)
   }
 }

@@ -31,9 +31,11 @@ builder.Services.AddScoped<LogUserActivity>();
 // see https://learn.microsoft.com/en-us/dotnet/core/extensions/dependency-injection/service-lifetimes fore more`
 
 // add repository to be used in app
-builder.Services.AddScoped<IMemberRepository, MemberRepository>(); 
-builder.Services.AddScoped<ILikesRepository, LikesRespository>();
-builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+// builder.Services.AddScoped<IMemberRepository, MemberRepository>(); 
+// builder.Services.AddScoped<ILikesRepository, LikesRespository>();
+// builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+// above replaced by UnitOfWork 
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // 'bind' configuration defined in appsettings.json, section CloudinarySettings to the CloudinarySettings class
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));

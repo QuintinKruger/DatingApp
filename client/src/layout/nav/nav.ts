@@ -21,6 +21,7 @@ export class Nav implements OnInit {
   protected creds: any = {}
   protected selectedTheme = signal<string>(localStorage.getItem('theme') || 'light');
   protected themes = themes
+  protected loading = signal(false);
 
   ngOnInit(): void {
      document.documentElement.setAttribute('data-theme', this.selectedTheme()) // this is how we apply a theme in daisy UI
@@ -41,6 +42,7 @@ export class Nav implements OnInit {
   }
 
   login() {
+    this.loading.set(true)
     this.accountService.login(this.creds).subscribe({
       next: () => {
         this.router.navigateByUrl("/members");
@@ -49,7 +51,8 @@ export class Nav implements OnInit {
       },
       error: (error: any) => {
         this.toastService.error(error.error);
-      }
+      },
+      complete: () => this.loading.set(false)
     }
     )
   }
@@ -57,5 +60,15 @@ export class Nav implements OnInit {
   logout() {
     this.accountService.logout();
     this.router.navigateByUrl("/");
+  }
+
+  handleSelectUserItem() {
+     // the active element at this point should be our dropdown
+    // this will blur the drop down away when we select a theme 
+    // this is daisy-ui's suggested method of removing the dropdown
+    const elm = document.activeElement as HTMLDivElement
+    if (elm) {
+      elm.blur()
+    }
   }
 }
