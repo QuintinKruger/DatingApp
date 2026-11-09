@@ -58,7 +58,7 @@ export class AccountService {
           this.logout();
         }
       })
-    }, 5 * 60 * 1000) // every 5 mins   
+    }, 7 * 24 * 60 * 60 * 1000) // every 7 days - not secure this is so that we dont use free azure credits    
   }
 
   setCurrentUser(user: User) {
