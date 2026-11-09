@@ -21,7 +21,7 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
 {
     // specify the connection string name that contains connection info stored in our configuration 
     // file (appsettings.json or other environment files like appsettings.Development.json)
-    opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")); 
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")); 
 }); // tell app about our DBContext and provide it with options
 builder.Services.AddCors(); // to add CORS header to responses for clients to accept cross origin content  
 // builder.Services.AddTransient() // new instance of service everytime its queried from service container
@@ -111,9 +111,14 @@ app.UseCors( x => x
 app.UseAuthentication(); 
 app.UseAuthorization(); // role based and policy based authorization works because of this added to middleware
 
+// angular app hosting from within .NET application
+app.UseDefaultFiles(); // looks inside of wwwroot folder (angular app resources)
+app.UseStaticFiles(); // serve content by default in wwwroot folder
+
 app.MapControllers();
 app.MapHub<PresenceHub>("hubs/presence");
 app.MapHub<MessageHub>("hubs/messages");
+app.MapFallbackToController("Index", "Fallback"); // define the fallback controller for the angular app when dotnet does not handle the url
 
 // add seed data to our DB
 // service locator pattern used below - this is because we do not have access to our dependencies here

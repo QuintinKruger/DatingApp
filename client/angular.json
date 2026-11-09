@@ -48,6 +48,7 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
+            "outputPath": { "base": "../API/wwwroot", "browser": ""}, // angular app will be hosted inside of our API thus relative to it, by default the content is stored in browser folder so just making it empty
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "assets": [
@@ -63,7 +64,7 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
+                  "maximumWarning": "700kB",
                   "maximumError": "1MB"
                 },
                 {

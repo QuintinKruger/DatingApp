@@ -1,7 +1,8 @@
 import { HttpEvent, HttpInterceptorFn, HttpParams } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { BusyService } from '../busy-service';
-import { delay, finalize, of, tap } from 'rxjs';
+import { delay, finalize, identity, of, tap } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 const cache = new Map<string,HttpEvent<unknown>>();
 
@@ -46,7 +47,8 @@ export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
   busyService.busy();
 
   return next(req).pipe(
-    delay(500),
+    // (environment.production ? null : delay(500)), // cant define null as a value so the alternative is 
+    (environment.production ? identity : delay(500)), 
     tap(response => {
       cache.set(cacheKey, response) // set elements of the cache
     }),
