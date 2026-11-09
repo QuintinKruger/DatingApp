@@ -58,6 +58,7 @@ public class Seed
             {
                 Url = member.ImageUrl!,
                 MemberId = member.Id,
+                IsApproved = true
 
             });
 

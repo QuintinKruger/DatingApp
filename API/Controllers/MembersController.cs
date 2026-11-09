@@ -46,7 +46,11 @@ public class MembersController(
     [HttpGet("{id}/photos")]
     public async Task<ActionResult<IReadOnlyList<Photo>>> GetMemberPhotos(string id)
     {
-        return Ok(await uow.MemberRepository.GetPhotosForMemberAsync(id));
+        if (User.GetMemberId() == id)
+        {
+             return Ok(await uow.MemberRepository.GetPhotosForMemberAsync(id, false));
+        }
+        return Ok(await uow.MemberRepository.GetPhotosForMemberAsync(id, true));
     }
 
     [HttpPut]
@@ -93,14 +97,6 @@ public class MembersController(
             MemberId = User.GetMemberId()
         };
 
-        // this is the first image upload for member so set it to the member's 
-        // 'profile' image
-        if (member.ImageUrl == null)
-        {
-            member.ImageUrl = photo.Url;
-            member.User.ImageUrl = photo.Url;
-        }
-
         member.Photos.Add(photo);
 
         if (await uow.Complete()) return photo;
@@ -134,7 +130,7 @@ public class MembersController(
 
          if (member == null) return BadRequest("Cannot get member from token");
 
-         var photo = member.Photos.SingleOrDefault(x => x.Id == photoId);
+         var photo = await uow.PhotoRepository.GetPhotoById(photoId);
 
          if (photo == null || photo.Url == member.ImageUrl) return BadRequest("This photo cannot be deleted");
 

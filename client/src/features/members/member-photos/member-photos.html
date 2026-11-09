@@ -6,12 +6,20 @@
 <div class="grid grid-cols-4 auto-rows-min gap-3 p-5 h-[65vh] overflow-auto">
     @for (photo of photos(); track photo.id) {
     <div class="relative">
-        <img src="{{photo.url}}" alt="photo of member" class="w-full rounded-lg">
+        <img src="{{photo.url}}" alt="photo of member" class="w-full rounded-lg" [class.opacity-20]="photo.isApproved === null || photo.isApproved === false">
+        @if (photo.isApproved === null) {
+            <span class="absolute inset-x-0 text-center bottom-1 text-red-500 font-semibold border-1 rounded-2xl">Awaiting approval</span>
+        }
+        @if (photo.isApproved === false) {
+            <span class="absolute inset-x-0 text-center bottom-1 text-red-500 font-semibold border-1 rounded-2xl">Rejected</span>
+        }
+        
         @if (accountService.currentUser()?.id === memberService.member()?.id) {
-        <app-star-button class="absolute top-1 right-1" [disabled]="photo.url === memberService.member()?.imageUrl"
+        <app-star-button class="absolute top-1 right-1" [disabled]="photo.url === memberService.member()?.imageUrl || photo.isApproved === null"
             [selected]="photo.url === memberService.member()?.imageUrl" (clickEvent)="setMainPhoto(photo)" />
         <app-delete-button class="absolute top-1 left-1" [disabled]="photo.url === memberService.member()?.imageUrl"
             (clickEvent)="deletePhoto(photo.id)" />
+
 
         }
     </div>

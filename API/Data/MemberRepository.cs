@@ -13,6 +13,13 @@ public class MemberRepository(AppDbContext context) : IMemberRepository
         return await context.Members.FindAsync(id);
     }
 
+    public async Task<Member?> GetMemberByPhotoId(int photoId)
+    {
+        return await context.Members
+            .Include(x => x.Photos)
+            .SingleOrDefaultAsync(x => x.Photos.Any(p => p.Id == photoId));
+    }
+
     public async Task<Member?> GetMemberForUpdatesAsync(string id)
     {
         return await context.Members
@@ -24,7 +31,7 @@ public class MemberRepository(AppDbContext context) : IMemberRepository
     public async Task<PaginatedResult<Member>> GetMembersAsync(MemberParams memberParams)
     {
         var query = context.Members.AsQueryable(); // create a deferred execution query
-        
+
         query = query.Where(x => x.Id != memberParams.CurrentMemberId); // all members apart from current member
 
         if (memberParams.Gender != null)
@@ -49,11 +56,15 @@ public class MemberRepository(AppDbContext context) : IMemberRepository
         // return await context.Members.ToListAsync(); not pagination
     }
 
-    public async Task<IReadOnlyList<Photo>> GetPhotosForMemberAsync(string memberId)
+    public async Task<IReadOnlyList<Photo>> GetPhotosForMemberAsync(string memberId, bool filterIsApprovedTrue)
     {
-        return await context.Members
+        var query = context.Members
             .Where(x => x.Id == memberId)
-            .SelectMany(x => x.Photos).ToListAsync();
+            .SelectMany(x => x.Photos);
+
+        if (filterIsApprovedTrue) return await query.Where(x => x.IsApproved == true).ToListAsync();
+
+        return await query.ToListAsync();
     }
 
     // not strictly needed - change tracking is already setup for us 
