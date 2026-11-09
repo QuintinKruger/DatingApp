@@ -10,7 +10,9 @@
             <h1 class="text-5xl font-bold">Find your match</h1>
             <p class="py-6">Come on in... all you need to do is sugn up</p>
             <div class="flex items-center gap-3">
-                <button class="btn btn-primary btn-lg" (click)="showRegsiter(true)">Register</button>
+                @if (!accountService.currentUser()) {
+                    <button class="btn btn-primary btn-lg" (click)="showRegsiter(true)">Register</button>
+                }
                 <button class="btn btn-info btn-lg">Learn more</button>
             </div>
         </div>

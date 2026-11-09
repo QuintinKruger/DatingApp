@@ -22,6 +22,20 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.x'
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.14'
+      
+      - name: Install Angular CLI
+        run: npm install -g @angular/cli@21
+
+      - name: Install deps and build Angular app
+        run: |
+          cd client
+          npm install
+          ng build
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
